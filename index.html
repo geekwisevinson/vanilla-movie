@@ -11,6 +11,7 @@
         .container {
             height: 100%;
             position: relative;
+            overflow: hidden;
         }
 
         .left-eye, .right-eye {
@@ -30,161 +31,20 @@
             right: 20%;
         }
     </style>
+    <script src="js/play.js"></script>
+    <script src="js/classes/actor.js"></script>
+    <script src="js/classes/moment.js"></script>
+    <script src="js/classes/scene.js"></script>
+    <script src="js/css-shapes/css-shapes.js"></script>
+
+<!--    load scene -->
+    <script src="js/scenes/test/test.js"></script>
 </head>
 <body>
 
 
 <script>
 
-    class Actor {
-        name = '';
-        styles = null;
-        parts = {};
-        partActor;
-        el;
-
-        constructor(name, styles, partActor) {
-            this.setConfig(name, styles);
-            this.partActor = partActor;
-        }
-
-        setConfig(name, styles) {
-            this.name = name;
-            this.styles = styles;
-        }
-
-        display(moment) {
-            const existedPreviously = document.querySelector(`#${this.name}`);
-            this.el = document.querySelector(`#${this.name}`) || document.createElement('div');
-            this.el.id = this.name;
-            console.log('this.name', this.name, moment);
-            if (!existedPreviously) {
-                if (this.partActor) {
-                    this.partActor.el.children[0].appendChild(this.el);
-                } else {
-                    document.body.appendChild(this.el);
-                }
-
-                const container = document.createElement('div');
-                container.classList.add('container');
-                this.el.appendChild(container);
-            }
-            this.setStyles(this.el, this.styles);
-            for (const property in this.parts) {
-                if (this.parts.hasOwnProperty(property)) {
-                    this.parts[property].display();
-                }
-            }
-
-        }
-
-        setStyles(el, styles) {
-            el.style.transition = 'ease 10s all';
-            for (const property in styles) {
-                if (styles.hasOwnProperty(property)) {
-                    el.style[property] = styles[property];
-                }
-            }
-        }
-
-        updateScene(scene, time, style, ms) {
-            if (ms) {
-                style.transition = `all ease ${ms}ms`
-            }
-            scene.addMoments([new Moment(time, [new Actor(this.name, style)])]);
-        }
-
-        addPartsActors(actors) {
-            console.log('add parts', actors, this);
-            for (let i = 0; i < actors.length; i++) {
-                this.parts[actors[i].name] = actors[i];
-            }
-        }
-    }
-
-
-    class Moment {
-        time = 0;
-        actors = {};
-
-        constructor(time, actors) {
-            this.time = time;
-            this.addActor(actors);
-        }
-
-        addActor(actors) {
-            for (let i = 0; i < actors.length; i++) {
-                this.actors[actors[i].name] = actors[i];
-            }
-        }
-
-        apply() {
-            for (let name in this.actors) {
-                if (this.actors.hasOwnProperty(name)) {
-                    this.actors[name].display(this);
-                }
-            }
-        }
-    }
-
-    class Scene {
-        currentTime = 0;
-        moments = {};
-
-        constructor(moments) {
-            this.addMoments(moments)
-        }
-
-        addMoments(moments) {
-            for (let i = 0; i < moments.length; i++) {
-                this.moments[moments[i].time] = moments[i];
-            }
-        }
-
-        update() {
-            if (this.moments[this.currentTime]) {
-                this.moments[this.currentTime].apply();
-            }
-            this.currentTime++;
-        }
-    }
-
-    // you can create an actor
-    const actor = new Actor('vinson', {
-        left: '100px', top: '100px', width: '100px', height: '100px', background: 'red',
-        borderRadius: `50% 50% 50% 50% / 40% 40% 60% 60%`
-    });
-    const lefty = new Actor('left-eye', {
-        width: '20%', height: '20%',
-        top: '40%', left: '20%', background: 'grey'
-    }, actor);
-
-    actor.addPartsActors([lefty]);
-    const actor2 = new Actor('brittney', {
-        left: '300px', top: '100px', width: '100px', height: '100px', background: 'blue',
-        borderRadius: `50% 50% 50% 50% / 40% 40% 60% 60%`
-    });
-    // you can create moments and pass in actors
-    const moment = new Moment(4, [actor]);
-    const moment2 = new Moment(100, [actor2]);
-
-    // you can create a scene pass in a moment
-    const scene = new Scene([moment]);
-
-    // you can add moments to a scene after it is created
-    scene.addMoments([moment2]);
-    scene.addMoments([new Moment(101, [new Actor('vinson', {transition: 'all ease 1s', top: '200px'})])]);
-
-    // you can update an actor in a moment
-    actor.updateScene(scene, 130, {background: 'purple'}, 1000);
-    lefty.updateScene(scene, 140, {right: '20%', borderRadius: '50%'}, 400);
-
-    function play() {
-        scene.update();
-        window.requestAnimationFrame(play);
-    }
-
-    play();
 </script>
 
 </body>
